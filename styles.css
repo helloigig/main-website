@@ -1,0 +1,196 @@
+
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Jost';
+    background-color:#fbfaf9;
+}
+
+.split-screen {
+    display: flex;
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+}
+
+.title{
+    font-size: 60px;
+    font-weight:400;
+}
+
+.yearanddescription{
+    padding:0 3px;
+}
+.year {
+    font-size: 14px;
+    font-weight:300;
+}
+
+.description {
+    font-size: 14px;
+    font-weight:300;
+}
+
+.bodycopy{
+    padding:0 3px;
+    font-size: 12px;
+    font-weight:300;
+}
+
+/* .left-panel, .right-panel {
+    flex-grow: 1;
+} */
+
+.right-panel{
+    /* flex-grow:1; */
+    background-color:white;
+    /* width:100%; */
+    transition: width 0.5s ease, transform 0.5s ease;
+    transform: translateX(100%); 
+    overflow: auto; /* For scrolling content */
+    transform: translateX(100%); /* Initially positioned off-screen */
+
+    flex-basis: 50%; /* Adjust as necessary */
+    z-index: 10; /* Ensure it's above the image */
+
+    opacity:1;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}
+
+.left-panel {
+    flex-grow:1;
+    transition: flex-grow 0.5s ease; 
+    position:relative;
+}
+
+img {
+    width: 100%; 
+    height: auto; 
+    object-fit: cover; 
+  }
+
+
+
+#draggable-image {
+    width: auto; 
+    height: 1717px;
+    position: fixed;
+    cursor: grab;
+    object-fit: contain; /* This ensures the whole image is visible */
+        /* Center the image initially */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    
+}
+
+.location-marker {
+    transition: transform 0.3s ease, width 0.3s ease;
+    position: relative; 
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; 
+    /* position: absolute; */
+    padding:4px 14px 6px 14px;
+    background-color: white;
+    border-radius: 8px;
+    cursor:pointer;
+    white-space: nowrap; /* Prevents text from wrapping */
+    /* bottom: [YourDynamicValue]px;  */
+    transition: all 0.3s ease; /* Smooth transition for expanding and shrinking */
+}
+
+
+.location-marker.expanded {
+    transform: translateY(-100%); 
+}
+
+.expanded{
+    transform-origin: center bottom; /* Anchor the transformation */
+    transform: scale(1.5, 1); /* Scale horizontally */
+    transition: transform 0.3s ease width 0.3s ease; /* Smooth transition */
+}
+
+.location-marker:hover {
+    transform: none !important;
+    width: auto !important;
+    height: auto !important;
+    /* padding-left: calc(14px + 10px); 
+    padding-right: calc(14px + 10px);  */
+}
+
+.location-marker .marker-list {
+    display: none; 
+}
+
+.marker-list {
+    display: none;
+    margin-top: 10px; 
+    transition: max-height 0.3s ease; 
+}
+
+.location-marker::after {
+    content: '';
+    position: absolute;
+    bottom: -10px; 
+    left: 50%; /* Center the arrow */
+    transform: translateX(-50%); /* Ensure arrow is centered */
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid white; 
+}
+
+
+.text-bubble {
+    text-align:center;
+    align-items: center; 
+    justify-content: center; 
+ }
+ 
+
+.svg-and-marker-container {
+    position: relative;
+    height: 100%;
+}
+
+/* .location-marker:hover {
+    transform:scale(1.1);
+} */
+
+/* Class to slide the panel out */
+.slide-out {
+    transform: translateX(-100%);
+    opacity: 0;
+    animation-name: slideOut;
+
+}
+
+/* Class to slide the panel in */
+.slide-in {
+    transform: translateX(0%);
+    opacity: 1;
+    animation-name: slideIn;
+
+}
+
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
