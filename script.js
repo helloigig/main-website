@@ -1,5 +1,4 @@
 
-
 import { createClient } from 'https://esm.sh/@sanity/client'
 
 
@@ -173,9 +172,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             let imgRect = img.getBoundingClientRect();
             let newPosX = imgRect.left + window.scrollX + markerPos.x;
     
-            // Calculate the bottom position by subtracting the marker's y position 
-            // from the image's bottom edge relative to the viewport
-            // let markerBottomPosition = window.innerHeight - Math.abs(imgRect.bottom - markerPos.y); 
+    
             let markerTopPosition = imgRect.top + window.scrollY + markerPos.y;
         
             // Convert this to a position from the bottom of the viewport
@@ -186,8 +183,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             marker.style.bottom = markerBottomPosition + 'px'; // Set bottom position
         }
     }
-    
-
     
     function initializeMarkers(img) {
         markerPositions.forEach(markerPos => {
@@ -216,23 +211,27 @@ document.addEventListener('DOMContentLoaded', async function () {
         // console.log("markercontainer")
 
         markerContainer.addEventListener('mouseover', async () => {
+            // Collapse any previously expanded marker
+            if (activeMarkerId && activeMarkerId !== id) {
+                let previousMarker = document.getElementById(activeMarkerId);
+                if (previousMarker) {
+                    previousMarker.classList.remove('expanded');
+                    hideMarkerList(activeMarkerId);
+                }
+            }
+    
             markerContainer.classList.add('expanded');
             const projectData = await fetchProjectDataByTitle(text);
-              if (activeMarkerId && activeMarkerId !== id) {
-            hideMarkerList(activeMarkerId); // Hide the previous marker's list
-        }
-        if (projectData && projectData.Description) {
-            showMarkerList(id, projectData.Description);
-        }
-        
+            if (projectData && projectData.Description) {
+                showMarkerList(id, projectData.Description);
+            }
+            
+            activeMarkerId = id; // Update the active marker ID
         });
     
         markerContainer.addEventListener('mouseout', () => {
             markerContainer.classList.remove('expanded');
-
-            if (id !== activeMarkerId) {
-                hideMarkerList(id);
-            }
+            hideMarkerList(id);
         });
 
         
@@ -314,11 +313,11 @@ function resetMarker(markerId) {
 }
 
     
-    function updateAllMarkersPositions(img) {
-        markerPositions.forEach(markerPos => {
-            updateMarkerPosition(markerPos.id, markerPos, img);
-        });
-    }
+    // function updateAllMarkersPositions(img) {
+    //     markerPositions.forEach(markerPos => {
+    //         updateMarkerPosition(markerPos.id, markerPos, img);
+    //     });
+    // }
 
     window.addEventListener('resize', function() {
         if (document.querySelector('.right-panel').style.transform === 'translateX(0%)') {
@@ -327,43 +326,71 @@ function resetMarker(markerId) {
     });
 
     // Function to handle the drag event
+    // function elementDrag(e) {
+    //     e = e || window.event;
+    //     e.preventDefault();
+    //     posX = posInitialX - e.clientX;
+    //     posY = posInitialY - e.clientY;
+    //     posInitialX = e.clientX;
+    //     posInitialY = e.clientY;
+    //     // Calculate new position
+    //     let newLeft = img.offsetLeft - posX;
+    //     let newTop = img.offsetTop - posY;
+
+    //     // Get window dimensions
+    //     let windowWidth = window.innerWidth;
+    //     let windowHeight = window.innerHeight;
+
+    //     // Get SVG dimensions
+    //     let svgWidth = img.offsetWidth;
+    //     let svgHeight = img.offsetHeight;
+
+    //     // Restrict movement
+
+    //     let leftConstraint = windowWidth - (svgWidth / 2) + (svgWidth - windowWidth);
+    //     let topConstraint = windowHeight - (svgHeight / 2) + (svgHeight - windowHeight)
+    //     let rightConstraint = -(windowWidth - (svgWidth / 2) + (svgWidth - windowWidth)) + windowWidth / 2
+
+    //     if (newLeft > leftConstraint) newLeft = leftConstraint;
+    //     if (newTop > topConstraint) newTop = topConstraint;
+    //     // if (newLeft < windowWidth - svgWidth) newLeft = windowWidth - svgWidth;
+    //     // if (newTop < windowHeight - svgHeight) newTop = windowHeight - svgHeight;
+    //     if (newLeft < rightConstraint) newLeft = rightConstraint;
+    //     if (newTop < 0) newTop = 0;
+    //     // Apply new position
+    //     img.style.left = (img.offsetLeft - posX) + "px";
+    //     img.style.top = (img.offsetTop - posY) + "px";
+    //     updateAllMarkersPositions(img);
+    // }
+
+    
     function elementDrag(e) {
         e = e || window.event;
         e.preventDefault();
+    
+        // Calculate new position
         posX = posInitialX - e.clientX;
         posY = posInitialY - e.clientY;
         posInitialX = e.clientX;
         posInitialY = e.clientY;
-        // Calculate new position
+    
         let newLeft = img.offsetLeft - posX;
         let newTop = img.offsetTop - posY;
-
-        // Get window dimensions
-        let windowWidth = window.innerWidth;
-        let windowHeight = window.innerHeight;
-
-        // Get SVG dimensions
-        let svgWidth = img.offsetWidth;
-        let svgHeight = img.offsetHeight;
-
-        // Restrict movement
-
-        let leftConstraint = windowWidth - (svgWidth / 2) + (svgWidth - windowWidth);
-        let topConstraint = windowHeight - (svgHeight / 2) + (svgHeight - windowHeight)
-        let rightConstraint = -(windowWidth - (svgWidth / 2) + (svgWidth - windowWidth)) + windowWidth / 2
-
-        if (newLeft > leftConstraint) newLeft = leftConstraint;
-        if (newTop > topConstraint) newTop = topConstraint;
-        // if (newLeft < windowWidth - svgWidth) newLeft = windowWidth - svgWidth;
-        // if (newTop < windowHeight - svgHeight) newTop = windowHeight - svgHeight;
-        if (newLeft < rightConstraint) newLeft = rightConstraint;
-        if (newTop < 0) newTop = 0;
+    
         // Apply new position
-        img.style.left = (img.offsetLeft - posX) + "px";
-        img.style.top = (img.offsetTop - posY) + "px";
-        updateAllMarkersPositions(img);
+        img.style.left = newLeft + "px";
+        img.style.top = newTop + "px";
+    
+        // Update all markers positions
+        requestAnimationFrame(() => updateAllMarkersPositions(img));
     }
-
+    
+    function updateAllMarkersPositions(img) {
+        markerPositions.forEach(markerPos => {
+            updateMarkerPosition(markerPos.id, markerPos, img);
+        });
+    }
+    
     // Function to handle the mouse down event to start dragging
     function dragMouseDown(e) {
         e = e || window.event;
